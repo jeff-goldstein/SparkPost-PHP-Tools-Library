@@ -1,0 +1,92 @@
+   Purpose: Compare Template Substitution Fields against Substitution Data being sent to the template.
+    The main function, SubDataCheck is meant to be called with the substitution data and/or global substitution data just before adding it into the transmission call.  
+    It will check to make sure that there is a corresponding substitution field for each field the template is looking for.
+    
+    EndPoint (1)
+    SubDataCheck, the main application is expecting the following parameters:
+    
+    Paramter Name                Required Y/N        	Notes
+    --------------------------    ------------        	-------------------------------------------------------------------------------------------------------------------------------------------------
+    apikey								Y               This application uses your account to get the Template from your account.  It needs an API key with the ability to read templates
+    apiroot                           	Y               For SparkPost.com this should be: https://api.sparkpost.com/api/v1/  For Enterprise customers, use your unique URL
+    template                          	Y               The Template ID you are validating against            
+    recsub                            	Y               This can be an empty string, but if you send data you must send it in the following format
+    												  	{"substitution_data" : {fields.........arrays......etc}}
+    globalsub                        	Y               This can be an empty string, but if you send data you must send it in the following format
+    												  	{"substitution_data" : {fields.........arrays......etc}}
+    substitutionItemList            	Y               An empty array that SubDataCheck will fill with a list of all fields found in the rec and global substitution data blocks
+    templateItemList                	Y               An empty array that SubDataCheck will fill with a list of all fields found in the template
+    missingFields                    	Y               An empty array that SubDataCheck will fill with a list of any fields found in the template but missing from the recipient/global data or optionally, empty/NULL
+    addEmptyFieldstoMissingListFlag		Y				If you want empty/Null substitution fields to be added to the MissingFields list send TRUE; otherwise False
+    
+    
+    EndPoint (2)
+    IsJson, is a short function that allows you to validate the structure of your data (recipient/global) before sending it to SubDataCheck.  Just like SubDataCheck, the substitution_data block must be surrounded by {}  
+     
+    Paramter Name                Required Y/N        	Notes
+    --------------------------    ------------        	-------------------------------------------------------------------------------------------------------------------------------------------------
+    string                            	Y               The function will validate the string to make sure they are properly formatted JSON
+    
+    
+    EndPoint (3)
+    BuildTemplateFields, will scan a template and build an array with all of the fields found in the template.
+    
+    Paramter Name                Required Y/N        	Notes
+    --------------------------    ------------        	-------------------------------------------------------------------------------------------------------------------------------------------------
+    apikey								Y               This application uses your account to get the Template from your account.  It needs an API key with the ability to read templates
+    apiroot                           	Y               For SparkPost.com this should be: https://api.sparkpost.com/api/v1/  For Enterprise customers, use your unique URL
+    template                          	Y               The Template ID you are requesting the field list from              
+    templateItemList                	Y               An empty array that SubDataCheck will fill with a list of all fields found in the template
+    filename							N				If a filename is sent to the function, it will dump the templateItemList out to that file
+      
+    
+    Warning Notes:  
+    1) When decoding the substitution fields, PHP creates index fields into the array.  Ultimately, those numbers are added into the list of substitution data fields.  Becuase the
+    user may use numeric field names as well, I'm leaving those indexes in the list instead of trying to figure out if they are PHP decoded generated or field names the user created.
+    
+    2) There is only ONE entry created for each atomic field name within the global/recipient data sets!!!  This program does NOT track the full json structure name.  Let's look at the first entry of the following JSON structure:
+       
+       Recipient Substitution Data:
+       "ProductList":[  
+               {  
+                  "item_name":"camp_microphone",
+                  "long_description":"Comfortable sound isolating sleeves block up to 37 dB of ambient noise. Sound isolation technology prevents outside noise from interfering with your listening experience, whether on-stage or on-the-go. Camp Sound Isolating Earphones require a proper fit to achieve the best sound.",
+                  "price":"102.35",
+                  "savings":"12.87",
+                  "font_color":"black",
+                  "featureList":[  
+                     {  
+                        "description":"",
+                        "font_color" :"black"
+                     },
+                     {  
+                        "description":"Volume Control",
+                        "font_color":"blue"
+                     },
+                     {  
+                        "description":"Noise Isolating",
+                        "font_color":"red"
+                     }
+                  ]
+               },
+    
+       Global Substitution Data:
+       		"subject": "Your Purchase History As Requested",
+        	"from" : "jeff.goldstein@mail.geekwithapersonality.com",
+        	"DelivChannel": "trans",
+        	"header_background_color": "#abcdef",
+        	"text_decoration_color": "#378cd2",
+        	"hover_color": "#82b450",
+       		"description":"",
+       		
+       		
+       o No matter how many products reside within the 'ProductList array' this application will only capture one entry for each field name and they will be at the lowest atomic level.  
+         In this example: ProductList, item_name, description, long_description, price, savings, featureList, font_color, subject, from, DelivChannel, header_background_color, text_decoration_color and hover_color will all be captured.
+       o Notice that 'description' and 'font_color' will only be listed once and there is no ProductList.featureList.description or ProductList.featureList.font_color entry.
+       o If the same field name is used in both the global and recipient data sets, there will still only be ONE entry.
+       o This means that the first time a field name is found; the corresponding value for that field will be what is used for further comparisons.  In this example, because Recipient data will be scanned first,  
+         when the system compares the Template field 'description' with the scanned recipient/global fields, it will be marked as 'empty', because the first occurrence  of 'description' is empty.
+       o Because SparkPost puts uses an order of precedence  where recipient data overrides global data, this application will scan the recipient data first for fields and use those values. 
+    
+       One caveat of all of this is, that when using the 'addEmptyFieldstoMissingListFlag', you may not get 100% accurate results because only the values of the first time a field name is found/scanned will be used and may not represent 
+       the full dataset. 
