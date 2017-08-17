@@ -89,3 +89,9 @@
     
  One caveat of all of this is, that when using the 'addEmptyFieldstoMissingListFlag', you may not get 100% accurate results because only the values of the first time a field name is found/scanned will be used and may not represent 
        the full dataset. 
+       
+  Installation Notes:     
+  This was built and tested with PHP 2.5 with Zend Engine 2.5
+  Simply download TemplateToolsLibrary.php to your directory and make sure you include it inside your codebase.
+  There is a secondary test file that will test much but not all of the functionality.  That file has also been commented with expected
+  library input fields..
