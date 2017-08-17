@@ -79,14 +79,13 @@
         	"hover_color": "#82b450",
        		"description":"",
        		
-       		
-       o No matter how many products reside within the 'ProductList array' this application will only capture one entry for each field name and they will be at the lowest atomic level.  
+ o No matter how many products reside within the 'ProductList array' this application will only capture one entry for each field name and they will be at the lowest atomic level.  
          In this example: ProductList, item_name, description, long_description, price, savings, featureList, font_color, subject, from, DelivChannel, header_background_color, text_decoration_color and hover_color will all be captured.
-       o Notice that 'description' and 'font_color' will only be listed once and there is no ProductList.featureList.description or ProductList.featureList.font_color entry.
-       o If the same field name is used in both the global and recipient data sets, there will still only be ONE entry.
-       o This means that the first time a field name is found; the corresponding value for that field will be what is used for further comparisons.  In this example, because Recipient data will be scanned first,  
+ o Notice that 'description' and 'font_color' will only be listed once and there is no ProductList.featureList.description or ProductList.featureList.font_color entry.
+ o If the same field name is used in both the global and recipient data sets, there will still only be ONE entry.
+ o This means that the first time a field name is found; the corresponding value for that field will be what is used for further comparisons.  In this example, because Recipient data will be scanned first,  
          when the system compares the Template field 'description' with the scanned recipient/global fields, it will be marked as 'empty', because the first occurrence  of 'description' is empty.
-       o Because SparkPost puts uses an order of precedence  where recipient data overrides global data, this application will scan the recipient data first for fields and use those values. 
+ o Because SparkPost puts uses an order of precedence  where recipient data overrides global data, this application will scan the recipient data first for fields and use those values. 
     
-       One caveat of all of this is, that when using the 'addEmptyFieldstoMissingListFlag', you may not get 100% accurate results because only the values of the first time a field name is found/scanned will be used and may not represent 
+ One caveat of all of this is, that when using the 'addEmptyFieldstoMissingListFlag', you may not get 100% accurate results because only the values of the first time a field name is found/scanned will be used and may not represent 
        the full dataset. 
