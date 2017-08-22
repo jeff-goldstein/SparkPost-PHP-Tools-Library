@@ -154,7 +154,7 @@ test framework, simply a way to see the output of many of the functions.
     echo "\n\n-----The following output is data coming from the BuildTemplateFields function which produces a list of fields the template is using.";
     echo "\n\nThis function is similar to SubDataCheck, but only builds the list of template fields.\n";
     foreach ($templateItemList as $key => $value) {
-        printf("Field: %sn", $key);
+        printf("Field: %s\n", $key);
                 }
     
     $results = isJson($recsub);
